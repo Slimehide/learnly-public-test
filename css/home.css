@@ -891,16 +891,6 @@
   color: var(--orange);
 }
 
-.rail-all-arrow {
-  color: var(--orange);
-  font-size: 20px;
-  transition: transform 0.3s var(--ease-out);
-}
-
-.rail-all:hover .rail-all-arrow {
-  transform: translateX(5px);
-}
-
 .theme-rail {
   display: flex;
   gap: 22px;

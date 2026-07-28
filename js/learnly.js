@@ -51,6 +51,11 @@
         if (target === null) current = window.scrollY;
         target = clamp(y, 0, maxY());
         if (!raf) loop();
+      },
+      cancel() {
+        if (raf) cancelAnimationFrame(raf);
+        raf = null;
+        target = null;
       }
     };
   })();
@@ -58,10 +63,22 @@
   if (scroller) {
     window.addEventListener('wheel', e => {
       if (e.ctrlKey || document.body.classList.contains('menu-open') || document.body.classList.contains('lightbox-open')) return;
-      if (e.target.closest && e.target.closest('.theme-rail')) return;
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY) && e.target.closest && e.target.closest('.theme-rail')) return;
       e.preventDefault();
       scroller.nudge(e.deltaY);
     }, { passive: false });
+
+    window.addEventListener('mousedown', e => {
+      if (e.button === 1) scroller.cancel();
+    }, { passive: true });
+
+    window.addEventListener('keydown', e => {
+      if (['PageUp', 'PageDown', 'Home', 'End', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)) {
+        scroller.cancel();
+      }
+    }, { passive: true });
+
+    window.addEventListener('touchstart', () => scroller.cancel(), { passive: true });
   }
 
   const navOffset = () => {
