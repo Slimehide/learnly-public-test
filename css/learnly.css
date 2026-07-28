@@ -690,6 +690,7 @@ body.menu-open {
   position: sticky;
   top: 0;
   min-height: 100vh;
+  min-height: 100svh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -1766,24 +1767,39 @@ footer {
   display: block;
   width: 48px;
   height: 48px;
-  transform: scale(0.2);
-  background-color: var(--cream);
-  border: 1px solid var(--navy);
-  border-radius: 50%;
-  transition: transform 0.25s ease-in-out, background-color 0.4s, border-color 0.1s ease 0.3s;
-}
-
-.cursor.pointer .cursor-bg::before {
-  transform: scale(0.15);
+  transform: scale(0);
   background-color: var(--orange);
-  border-color: var(--orange);
+  border-radius: 50%;
+  transition: transform 0.25s ease-in-out, background-color 0.4s;
 }
 
 .cursor.label .cursor-bg::before {
   transform: scale(1.7);
-  background-color: var(--orange);
-  border-color: transparent;
-  transition-delay: 0s;
+}
+
+.cursor-spark {
+  position: absolute;
+  top: -17px;
+  left: -17px;
+  width: 34px;
+  height: 34px;
+  transition: transform 0.35s var(--ease-out), opacity 0.25s ease;
+  filter: drop-shadow(0 2px 6px rgba(5, 47, 80, 0.25));
+}
+
+.cursor-spark svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.cursor.pointer .cursor-spark {
+  transform: scale(0.6) rotate(45deg);
+}
+
+.cursor.label .cursor-spark {
+  transform: scale(0) rotate(120deg);
+  opacity: 0;
 }
 
 .cursor-text {
@@ -1810,6 +1826,7 @@ footer {
 .cursor.label .cursor-text {
   opacity: 1;
   transform: scale(1) rotate(0deg);
+  transition-delay: 0.09s;
 }
 
 @media (pointer: coarse), (prefers-reduced-motion: reduce) {

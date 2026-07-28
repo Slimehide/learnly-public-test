@@ -2,6 +2,7 @@
   'use strict';
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const coarse = window.matchMedia('(pointer: coarse)').matches;
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 
   document.querySelectorAll('[data-split]').forEach(el => {
@@ -57,6 +58,7 @@
   if (scroller) {
     window.addEventListener('wheel', e => {
       if (e.ctrlKey || document.body.classList.contains('menu-open') || document.body.classList.contains('lightbox-open')) return;
+      if (e.target.closest && e.target.closest('.theme-rail')) return;
       e.preventDefault();
       scroller.nudge(e.deltaY);
     }, { passive: false });
@@ -215,7 +217,7 @@
 
   function sizeHeroPin() {
     if (!heroPin || !heroSticky) return;
-    if (reduced) {
+    if (reduced || coarse) {
       heroPin.style.height = '';
       return;
     }
@@ -234,7 +236,7 @@
 
     if (reduced) return;
 
-    if (heroPin && heroMedia && heroSticky) {
+    if (heroPin && heroMedia && heroSticky && !coarse) {
       const distance = heroPin.offsetHeight - heroSticky.offsetHeight;
       const p = distance > 0 ? clamp(-heroPin.getBoundingClientRect().top / distance, 0, 1) : 0;
       const eased = 1 - Math.pow(1 - p, 2);
@@ -399,6 +401,85 @@
     });
   }
 
+  document.querySelectorAll('.theme-rail').forEach(rail => {
+    let dragging = false;
+    let moved = false;
+    let startX = 0;
+    let startScroll = 0;
+    let target = 0;
+    let current = 0;
+    let railRaf = null;
+    let lastX = 0;
+    let lastT = 0;
+    let velocity = 0;
+
+    const maxScroll = () => rail.scrollWidth - rail.clientWidth;
+
+    const settle = () => {
+      railRaf = null;
+      rail.classList.remove('gliding');
+    };
+
+    const glide = () => {
+      railRaf = requestAnimationFrame(() => {
+        current += (target - current) * 0.14;
+        if (Math.abs(target - current) < 0.5) current = target;
+        rail.scrollLeft = current;
+        if (current !== target || dragging) glide();
+        else settle();
+      });
+    };
+
+    const startGlide = () => {
+      rail.classList.add('gliding');
+      if (!railRaf) glide();
+    };
+
+    rail.addEventListener('dragstart', e => e.preventDefault());
+
+    rail.addEventListener('pointerdown', e => {
+      if (e.pointerType !== 'mouse' || e.button !== 0) return;
+      dragging = true;
+      moved = false;
+      startX = e.clientX;
+      lastX = e.clientX;
+      lastT = performance.now();
+      startScroll = rail.scrollLeft;
+      target = current = startScroll;
+      velocity = 0;
+      rail.classList.add('dragging');
+      startGlide();
+    });
+
+    window.addEventListener('pointermove', e => {
+      if (!dragging) return;
+      const dx = e.clientX - startX;
+      if (Math.abs(dx) > 4) moved = true;
+      target = clamp(startScroll - dx, 0, maxScroll());
+      const now = performance.now();
+      const dt = now - lastT || 16;
+      velocity = (lastX - e.clientX) / dt * 16;
+      lastX = e.clientX;
+      lastT = now;
+      startGlide();
+    });
+
+    window.addEventListener('pointerup', () => {
+      if (!dragging) return;
+      dragging = false;
+      rail.classList.remove('dragging');
+      target = clamp(target + velocity * 16, 0, maxScroll());
+      startGlide();
+    });
+
+    rail.addEventListener('click', e => {
+      if (moved) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, true);
+  });
+
   document.querySelectorAll('.faq-item').forEach(item => {
     const q = item.querySelector('.faq-q');
     const a = item.querySelector('.faq-a');
@@ -413,7 +494,9 @@
     const cursorEl = document.createElement('div');
     cursorEl.className = 'cursor hidden';
     cursorEl.setAttribute('aria-hidden', 'true');
-    cursorEl.innerHTML = '<div class="cursor-bg"></div><div class="cursor-text"></div>';
+    cursorEl.innerHTML =
+      '<div class="cursor-spark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 27.68 28.38"><path fill="#FB9C44" d="M13.84,2.9c.25.88.47,2.08.63,2.93.44,2.4.82,4.48,1.98,5.68,1.17,1.22,3.22,1.61,5.6,2.06.51.1,1.03.2,1.52.3.54.12.96.23,1.28.33-.32.1-.73.21-1.27.33-.5.11-1.03.21-1.55.31-2.36.45-4.4.84-5.57,2.04-1.17,1.2-1.55,3.28-1.99,5.69-.15.84-.37,2.05-.63,2.93-.25-.88-.47-2.08-.62-2.92-.44-2.41-.82-4.49-2-5.71-1.19-1.2-3.23-1.59-5.59-2.03-.29-.05-.58-.11-.86-.17-.87-.17-1.48-.33-1.92-.46.44-.13,1.06-.29,1.93-.46.32-.07.65-.13.98-.19,2.31-.44,4.31-.83,5.48-2.03,1.17-1.2,1.55-3.28,1.99-5.69.15-.84.37-2.04.62-2.92M13.83,0C11.14,0,11.6,8.28,9.83,10.08c-.88.9-3.26,1.23-5.45,1.67-2.29.46-4.38,1.03-4.38,2.43s2.09,1.98,4.38,2.44c2.2.43,4.58.77,5.45,1.66,1.76,1.81,1.31,10.1,4,10.1s2.24-8.29,4.01-10.1c.94-.97,3.76-1.28,6.14-1.8,2-.44,3.7-1.03,3.7-2.3s-1.7-1.84-3.7-2.29c-2.38-.51-5.19-.83-6.14-1.81-1.76-1.81-1.31-10.08-4.01-10.08h0Z"/></svg></div>' +
+      '<div class="cursor-bg"></div><div class="cursor-text"></div>';
     document.body.appendChild(cursorEl);
     const cursorText = cursorEl.querySelector('.cursor-text');
     let mx = 0;
