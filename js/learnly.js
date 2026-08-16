@@ -216,9 +216,27 @@
     if (reduced) statementUnits.forEach(u => u.classList.add('on'));
   }
 
-  const speedEls = [...document.querySelectorAll('[data-speed]')];
-  const stretchEls = [...document.querySelectorAll('[data-stretch]')];
-  const growEls = [...document.querySelectorAll('[data-grow]')];
+  const speedNodes = [...document.querySelectorAll('[data-speed]')];
+  const stretchNodes = [...document.querySelectorAll('[data-stretch]')];
+  const growNodes = [...document.querySelectorAll('[data-grow]')];
+  let speedEls = [];
+  let stretchEls = [];
+  let growEls = [];
+
+  function measureParallax() {
+    const y = window.scrollY;
+    const box = el => {
+      const r = el.getBoundingClientRect();
+      return { top: r.top + y, height: r.height };
+    };
+    speedEls = speedNodes.map(el => {
+      el.style.transform = '';
+      const b = box(el);
+      return { el, top: b.top, height: b.height, speed: parseFloat(el.dataset.speed) };
+    });
+    stretchEls = stretchNodes.map(el => ({ el, ...box(el) }));
+    growEls = growNodes.map(el => ({ el, ...box(el.parentElement) }));
+  }
   const watermark = document.querySelector('.cta-watermark');
   const progress = document.querySelector('.scroll-progress');
   const heroPin = document.querySelector('[data-hero-pin]');
@@ -228,7 +246,7 @@
   const heroHint = document.querySelector('.hero-scroll-hint');
   let ticking = false;
 
-  const HERO_SCROLL_GAP = 1.8;
+  const HERO_SCROLL_GAP = 0.5;
   const HERO_SCALE_AMOUNT = 0.32;
   const HERO_FADE_START = 0.62;
 
@@ -241,21 +259,33 @@
     heroPin.style.height = (heroSticky.offsetHeight + window.innerHeight * HERO_SCROLL_GAP) + 'px';
   }
 
+  let viewportH = window.innerHeight;
+  let docHeight = document.documentElement.scrollHeight;
+  let heroPinH = 0;
+  let heroStickyH = 0;
+
+  function measure() {
+    viewportH = window.innerHeight;
+    docHeight = document.documentElement.scrollHeight;
+    if (heroPin) heroPinH = heroPin.offsetHeight;
+    if (heroSticky) heroStickyH = heroSticky.offsetHeight;
+  }
+
   function scrollUpdate() {
     ticking = false;
-    const vh = window.innerHeight;
-    const doc = document.documentElement;
+    const vh = viewportH;
+    const y = window.scrollY;
 
     if (progress) {
-      const p = doc.scrollTop / (doc.scrollHeight - vh || 1);
+      const p = y / (docHeight - vh || 1);
       progress.style.transform = 'scaleX(' + clamp(p, 0, 1) + ')';
     }
 
     if (reduced) return;
 
     if (heroPin && heroMedia && heroSticky && !coarse) {
-      const distance = heroPin.offsetHeight - heroSticky.offsetHeight;
-      const p = distance > 0 ? clamp(-heroPin.getBoundingClientRect().top / distance, 0, 1) : 0;
+      const distance = heroPinH - heroStickyH;
+      const p = distance > 0 ? clamp((y - heroPin.offsetTop) / distance, 0, 1) : 0;
       const eased = 1 - Math.pow(1 - p, 2);
       const scale = 1 - eased * HERO_SCALE_AMOUNT;
 
@@ -275,25 +305,23 @@
       if (heroHint) heroHint.style.opacity = clamp(1 - p * 5, 0, 1).toFixed(3);
     }
 
-    speedEls.forEach(el => {
-      const r = el.getBoundingClientRect();
-      if (r.bottom < -200 || r.top > vh + 200) return;
-      const center = r.top + r.height / 2 - vh / 2;
-      el.style.transform = 'translateY(' + (center * -parseFloat(el.dataset.speed)).toFixed(1) + 'px)';
+    speedEls.forEach(m => {
+      const top = m.top - y;
+      if (top + m.height < -200 || top > vh + 200) return;
+      const center = top + m.height / 2 - vh / 2;
+      m.el.style.transform = 'translateY(' + (center * -m.speed).toFixed(1) + 'px)';
     });
 
-    stretchEls.forEach(el => {
-      const r = el.getBoundingClientRect();
-      const p = clamp((vh - r.top) / (vh * 0.85), 0, 1);
+    stretchEls.forEach(m => {
+      const p = clamp((vh - (m.top - y)) / (vh * 0.85), 0, 1);
       const eased = 1 - Math.pow(1 - p, 3);
-      el.style.setProperty('--stretch', (0.86 + eased * 0.14).toFixed(4));
-      el.style.setProperty('--stretch-r', (28 - eased * 22).toFixed(1) + 'px');
+      m.el.style.setProperty('--stretch', (0.86 + eased * 0.14).toFixed(4));
+      m.el.style.setProperty('--stretch-r', (28 - eased * 22).toFixed(1) + 'px');
     });
 
-    growEls.forEach(el => {
-      const r = el.parentElement.getBoundingClientRect();
-      const p = clamp((vh * 0.82 - r.top) / (r.height || 1), 0, 1);
-      el.style.transform = 'scaleY(' + p.toFixed(4) + ')';
+    growEls.forEach(m => {
+      const p = clamp((vh * 0.82 - (m.top - y)) / (m.height || 1), 0, 1);
+      m.el.style.transform = 'scaleY(' + p.toFixed(4) + ')';
     });
 
     if (statementUnits.length) {
@@ -319,13 +347,18 @@
     }
   }
 
-  sizeHeroPin();
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', () => {
+  const remeasure = () => {
     sizeHeroPin();
+    measure();
+    measureParallax();
     onScroll();
-  });
-  scrollUpdate();
+  };
+
+  remeasure();
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', remeasure);
+  window.addEventListener('load', remeasure);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(remeasure);
 
   const nav = document.querySelector('.nav');
   if (nav) {
@@ -431,6 +464,21 @@
     let velocity = 0;
 
     const maxScroll = () => rail.scrollWidth - rail.clientWidth;
+
+    const progress = rail.closest('.rail-wrap');
+    const thumb = progress ? progress.querySelector('[data-rail-progress]') : null;
+
+    const syncThumb = () => {
+      if (!thumb) return;
+      const max = maxScroll();
+      const p = max > 0 ? rail.scrollLeft / max : 0;
+      const track = thumb.parentElement.clientWidth;
+      thumb.style.transform = 'translateX(' + (p * (track - thumb.offsetWidth)).toFixed(1) + 'px)';
+    };
+
+    rail.addEventListener('scroll', syncThumb, { passive: true });
+    window.addEventListener('resize', syncThumb);
+    syncThumb();
 
     const settle = () => {
       railRaf = null;
@@ -577,20 +625,49 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('video[autoplay]').forEach(v => {
-      v.muted = true;
-      const tryPlay = () => v.play().catch(() => {});
-      tryPlay();
-      new IntersectionObserver(es => es.forEach(e => {
-        if (e.isIntersecting) tryPlay();
-        else v.pause();
-      }), { rootMargin: '200px' }).observe(v);
-    });
+    const loops = [...document.querySelectorAll('video[autoplay]')];
+
     if (reduced) {
-      document.querySelectorAll('video[loop][autoplay]').forEach(v => {
+      loops.forEach(v => {
         v.removeAttribute('autoplay');
         v.pause();
       });
+      return;
     }
+
+    const play = v => {
+      if (v.dataset.src && !v.src && !v.querySelector('source')) v.src = v.dataset.src;
+      if (v.preload === 'none') v.preload = 'auto';
+      const p = v.play();
+      if (p && p.catch) p.catch(() => {});
+    };
+
+    const budget = coarse ? 2 : 4;
+    const visible = new Set();
+
+    const apply = () => {
+      const ordered = loops.filter(v => visible.has(v));
+      ordered.forEach((v, i) => {
+        if (i < budget) play(v);
+        else if (!v.paused) v.pause();
+      });
+      loops.forEach(v => {
+        if (!visible.has(v) && !v.paused) v.pause();
+      });
+    };
+
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) visible.add(e.target);
+        else visible.delete(e.target);
+      });
+      apply();
+    }, { rootMargin: '10% 0px', threshold: 0.01 });
+
+    loops.forEach(v => {
+      v.muted = true;
+      v.disablePictureInPicture = true;
+      io.observe(v);
+    });
   });
 })();
