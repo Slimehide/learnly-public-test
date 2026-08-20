@@ -101,11 +101,8 @@
 }
 
 .days-intro {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 56px;
-  align-items: center;
-  margin-bottom: 64px;
+  max-width: 860px;
+  margin-bottom: 56px;
 }
 
 .day-role {
@@ -140,13 +137,6 @@
     font-size: 20px;
   }
 }
-@media (max-width: 920px) {
-  .days-intro {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-}
-
 .reward-card {
   background: #fff;
   border-radius: 22px;
@@ -846,11 +836,56 @@
 }
 
 .days-flow {
-  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+  gap: 56px;
+  align-items: start;
+}
+
+.days-aside {
+  position: sticky;
+  top: calc(var(--nav-top) + 72px + 26px);
+}
+
+.days-aside-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+
+.days-aside .video-frame {
+  border-radius: 18px;
+}
+
+.days-aside-note {
+  margin-top: 18px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--muted);
 }
 
 .days-flow .panels {
   gap: 20px;
+  min-width: 0;
+}
+
+@media (max-width: 1040px) {
+  .days-flow {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+
+  .days-aside {
+    position: static;
+  }
+
+  .days-aside-note {
+    max-width: 640px;
+  }
 }
 
 @media (max-width: 1080px) {
