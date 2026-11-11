@@ -821,20 +821,6 @@
   text-align: right;
 }
 
-.nav-program {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
-  color: var(--navy);
-  background: var(--teal-soft);
-  border-radius: 999px;
-  padding: 7px 14px;
-  margin-left: 14px;
-  white-space: nowrap;
-}
-
 .days-flow {
   display: grid;
   grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
@@ -885,11 +871,5 @@
 
   .days-aside-note {
     max-width: 640px;
-  }
-}
-
-@media (max-width: 1080px) {
-  .nav-program {
-    display: none;
   }
 }
