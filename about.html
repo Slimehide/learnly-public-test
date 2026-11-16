@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="robots" content="noindex">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Our Story — Why We Built Learnly | Learnly</title>
 <meta name="description" content="Why we built Learnly: the gap we kept hitting as parents, the camp we built instead, and the three founders behind it.">
@@ -11,10 +12,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,700;12..96,800&family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/about.css">
 <link rel="stylesheet" href="css/learnly.css">
+<link rel="stylesheet" href="css/about.css">
+<script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
+
+<a class="skip-link" href="#main">Skip to content</a>
 
 <div class="scroll-progress" aria-hidden="true"></div>
 
@@ -24,6 +28,7 @@
     <span class="nav-program">Our Story</span>
     <div class="nav-links">
       <a href="index.html">Home</a>
+      <a href="about.html" aria-current="page">Our Story</a>
       <a href="#promise">The Promise</a>
       <a href="#origin">The Gap</a>
       <a href="#game">The Game</a>
@@ -42,6 +47,7 @@
 <div class="mobile-menu" id="mobile-menu">
   <nav class="mobile-menu-links" aria-label="Mobile">
     <a href="index.html">Home</a>
+    <a href="about.html" aria-current="page">Our Story</a>
     <a href="#promise">The Promise</a>
     <a href="#origin">The Gap</a>
     <a href="#game">The Game</a>
@@ -51,21 +57,21 @@
   <a href="index.html#enroll" class="btn btn-orange mobile-menu-cta">Enroll Now</a>
 </div>
 
+<main id="main">
+
 <header class="story-hero">
   <div class="container">
     <div class="story-hero-grid">
       <div class="story-hero-copy">
-        <h1 data-split>
-          <span class="split-line">Our</span>
-          <span class="split-line"><em>Story.</em></span>
-        </h1>
+        <h1 data-split><span class="split-sr">Our Story.</span><span class="split-line" aria-hidden="true">Our</span><span class="split-line" aria-hidden="true"><em>Story.</em></span></h1>
         <div class="story-hero-side">
           <p data-reveal>Driven by the struggle to find a full-day camp program that balanced genuine fun with meaningful challenges and learning, we leveraged our background in family entertainment to build our own solution.</p>
           <p class="delay-1" data-reveal>We created Learnly to transform kids' passions into immersive, STEAM-powered games — simultaneously delivering the thrilling summer break children crave and the meaningful educational enrichment parents want them to have.</p>
         </div>
       </div>
       <figure class="story-hero-photo" data-reveal="right">
-        <img src="assets/about-hero.webp" alt="Learnly founders Lauren Tebbenhoff and Matt Moder standing in front of three Project Nebula Jr. mission posters" width="1280" height="853">
+        <img src="assets/about-hero.webp" alt="Learnly co-founders Lauren Moreno and Matt Moder standing in front of three Project Nebula Jr. mission posters" width="1280" height="853">
+        <figcaption class="photo-callout">Co-Founders, Lauren Moreno &amp; Matt Moder</figcaption>
       </figure>
     </div>
   </div>
@@ -131,11 +137,14 @@
     </div>
 
     <div class="method-media" data-reveal>
-      <div class="video-frame ratio-video" data-cursor="Play" data-lightbox="assets/hero-loop.mp4" role="button" tabindex="0" aria-label="Play the Learnly mission video">
-        <video autoplay muted loop playsinline preload="none" aria-label="A Learnly mission in progress">
-          <source src="assets/hero-loop.mp4" type="video/mp4">
+      <div class="video-frame ratio-video" data-cursor="Play" data-lightbox="assets/nebula-days.mp4" role="button" tabindex="0" aria-label="Play the Learnly mission video">
+        <video autoplay muted loop playsinline preload="none" poster="assets/poster-mission.webp" data-video-toggle>
+          <source src="assets/nebula-days.mp4" type="video/mp4">
         </video>
       </div>
+      <button type="button" class="video-toggle" data-video-control aria-label="Pause video">
+        <span class="video-toggle-icon" aria-hidden="true"></span>
+      </button>
     </div>
   </div>
 </section>
@@ -150,11 +159,11 @@
 
       <article class="founder">
         <div class="founder-photo">
-          <img src="assets/founder-lauren.webp" alt="Lauren Tebbenhoff, Learnly co-founder" loading="lazy">
+          <img src="assets/founder-lauren.webp" alt="Lauren Moreno, Learnly co-founder" loading="lazy">
         </div>
         <div class="founder-body">
           <div class="founder-head">
-            <h3 class="founder-name">Lauren Tebbenhoff</h3>
+            <h3 class="founder-name">Lauren Moreno</h3>
             <span class="founder-role">Cofounder and a determined mom</span>
           </div>
           <p class="founder-bio">As a full-time working mom to an active 8-year-old son, I knew the camp struggle firsthand. I was tired of paying a premium for stale, repetitive programs only to be met with daily complaints, a cycle that left me battling heavy working-parent guilt. I wanted a camp where my son could genuinely have fun while getting the brain-building challenges he needed. I've been working with families since high school — from day cares, to family entertainment, to supplemental education — and I knew there was a niche for families that was needed. That frustration became the spark for Learnly.</p>
@@ -175,8 +184,8 @@
       </article>
 
       <article class="founder">
-        <div class="founder-photo founder-photo--mono" aria-hidden="true">
-          <span class="founder-monogram">DT</span>
+        <div class="founder-photo">
+          <img src="assets/founder-david.webp" alt="David Tedesco, Learnly co-founder" loading="lazy">
         </div>
         <div class="founder-body">
           <div class="founder-head">
@@ -193,9 +202,12 @@
 
 <section class="cta-hero">
   <div class="cta-hero-media">
-    <video autoplay muted loop playsinline preload="none" aria-hidden="true">
+    <video autoplay muted loop playsinline preload="none" poster="assets/poster-cta.webp" aria-hidden="true" data-video-toggle>
       <source src="assets/hero-loop.mp4" type="video/mp4">
     </video>
+    <button type="button" class="video-toggle video-toggle--cta" data-video-control aria-label="Pause background video">
+      <span class="video-toggle-icon" aria-hidden="true"></span>
+    </button>
   </div>
   <div class="cta-hero-content">
     <h2 class="cta-hero-heading" data-split>
@@ -203,11 +215,13 @@
       <span class="split-line"><em class="custom">what we built.</em></span>
     </h2>
     <div class="cta-hero-bottom">
-      <p data-reveal>Five days. One mission. A kid who can't stop talking about it on the drive home. Week-long programs run <strong>May 18 – July 24, 2026.</strong> Ages 6–14.</p>
+      <p data-reveal>Week-long STEAM summer camp programs run <strong>May 17 – July 26, 2027.</strong> Ages 6–14. Multiple camp themes available. <strong>$599 per week.</strong> All materials included. Before and after care available. Spots fill fast. Located within nearby elementary school classrooms.</p>
       <a href="index.html#enroll" class="btn btn-orange delay-1" data-reveal>Enroll Now</a>
     </div>
   </div>
 </section>
+
+</main>
 
 <footer>
   <div class="container">

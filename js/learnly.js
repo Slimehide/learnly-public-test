@@ -127,13 +127,20 @@
   if (burger) {
     const menuLinks = document.querySelectorAll('.mobile-menu a');
     menuLinks.forEach((a, i) => a.style.setProperty('--i', i));
-    const closeMenu = () => {
-      document.body.classList.remove('menu-open');
-      burger.setAttribute('aria-expanded', 'false');
+    const menu = document.getElementById('mobile-menu');
+    const setMenu = open => {
+      document.body.classList.toggle('menu-open', open);
+      burger.setAttribute('aria-expanded', String(open));
+      burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      if (menu) {
+        if (open) menu.removeAttribute('inert');
+        else menu.setAttribute('inert', '');
+      }
     };
+    const closeMenu = () => setMenu(false);
+    setMenu(document.body.classList.contains('menu-open'));
     burger.addEventListener('click', () => {
-      const open = document.body.classList.toggle('menu-open');
-      burger.setAttribute('aria-expanded', open);
+      setMenu(!document.body.classList.contains('menu-open'));
     });
     const overlay = document.querySelector('.nav-overlay');
     if (overlay) overlay.addEventListener('click', closeMenu);
@@ -143,6 +150,43 @@
     });
     window.addEventListener('keydown', e => {
       if (e.key === 'Escape') closeMenu();
+    });
+  }
+
+  const toggles = [...document.querySelectorAll('[data-video-toggle]')];
+  if (toggles.length) {
+    toggles.forEach(video => {
+      const frame = video.closest('.method-media, .cta-hero-media') || video.parentElement;
+      const button = frame && frame.querySelector('[data-video-control]');
+      const label = button && /background/i.test(button.getAttribute('aria-label') || '') ? ' background video' : ' video';
+      const sync = () => {
+        if (!button) return;
+        button.classList.toggle('is-paused', video.paused);
+        button.setAttribute('aria-label', (video.paused ? 'Play' : 'Pause') + label);
+      };
+      if (reduced) {
+        video.autoplay = false;
+        video.removeAttribute('autoplay');
+        video.pause();
+      }
+      video.addEventListener('play', sync);
+      video.addEventListener('pause', sync);
+      if (button) {
+        button.addEventListener('click', ev => {
+          ev.preventDefault();
+          ev.stopPropagation();
+          if (video.paused) {
+            delete video.dataset.userPaused;
+            const played = video.play();
+            if (played && played.catch) played.catch(() => {});
+          } else {
+            video.dataset.userPaused = 'true';
+            video.pause();
+          }
+          sync();
+        });
+      }
+      sync();
     });
   }
 
@@ -636,6 +680,7 @@
     }
 
     const play = v => {
+      if (v.dataset.userPaused) return;
       if (v.dataset.src && !v.src && !v.querySelector('source')) v.src = v.dataset.src;
       if (v.preload === 'none') v.preload = 'auto';
       const p = v.play();
