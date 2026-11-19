@@ -156,7 +156,7 @@
   const toggles = [...document.querySelectorAll('[data-video-toggle]')];
   if (toggles.length) {
     toggles.forEach(video => {
-      const frame = video.closest('.method-media, .cta-hero-media') || video.parentElement;
+      const frame = video.closest('.method-media, .cta-hero-media, .story-hero-media') || video.parentElement;
       const button = frame && frame.querySelector('[data-video-control]');
       const label = button && /background/i.test(button.getAttribute('aria-label') || '') ? ' background video' : ' video';
       const sync = () => {

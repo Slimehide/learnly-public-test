@@ -69,10 +69,16 @@
           <p class="delay-1" data-reveal>We created Learnly to transform kids' passions into immersive, STEAM-powered games — simultaneously delivering the thrilling summer break children crave and the meaningful educational enrichment parents want them to have.</p>
         </div>
       </div>
-      <figure class="story-hero-photo" data-reveal="right">
-        <img src="assets/about-hero.webp" alt="Learnly co-founders Lauren Moreno and Matt Moder standing in front of three Project Nebula Jr. mission posters" width="1280" height="853">
-        <figcaption class="photo-callout">Co-Founders, Lauren Moreno &amp; Matt Moder</figcaption>
-      </figure>
+      <div class="story-hero-media" data-reveal="right">
+        <div class="story-hero-video">
+          <video autoplay muted loop playsinline preload="none" poster="assets/poster-story.webp" data-video-toggle aria-label="Learnly campers building in the classroom">
+            <source src="assets/educators.mp4" type="video/mp4">
+          </video>
+        </div>
+        <button type="button" class="video-toggle" data-video-control aria-label="Pause video">
+          <span class="video-toggle-icon" aria-hidden="true"></span>
+        </button>
+      </div>
     </div>
   </div>
 </header>
@@ -97,8 +103,9 @@
   <div class="container">
     <div class="split-two split-two--media-first" data-reveal>
       <div class="split-media">
-        <figure class="photo-frame photo-frame--portrait">
-          <img src="assets/learnly-labs.jpg" alt="Kids racing balloon-powered cars across the Learnly Labs floor" loading="lazy">
+        <figure class="photo-frame">
+          <img src="assets/about-hero.webp" alt="Learnly co-founders Lauren Moreno and Matt Moder standing in front of three Project Nebula Jr. mission posters" width="1280" height="853" loading="lazy">
+          <figcaption class="photo-callout">Co-Founders, Lauren Moreno &amp; Matt Moder</figcaption>
         </figure>
       </div>
       <div class="split-copy-col">
